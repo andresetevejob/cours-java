@@ -1,0 +1,243 @@
+include::chapter-base.adoc[]
+== Le langage Java, première partie
+
+=== Mon premier programme
+
+Un programme java a un unique point d’entrée qui sera utilisé pour le lancer.
+
+Ce point d’entrée, la fonction `main` est une méthode publique, statique, sans type de retour et prenant en paramètre un tableau de chaîne de caractères :
+
+.Fichier Main.java
+[source,java]
+----
+public class Main { // <1>
+    public static void main(String[] args) { // <2>
+        System.out.println("Hello " + (args.length > 0 ? args[0] : "World")); // <3>
+    }
+}
+----
+<1> La classe contenant la fonction `main` doit être publique
+<2> La _signature_ de la méthode doit être exacte, si elle n’est pas statique ou publique ou que les paramètres ne sont pas un unique tableau de chaîne de caractères, la fonction ne sera pas reconnue
+<3> Du code _procédural_ peut être écrit à l’intérieur de cette méthode, en Java, les instructions doivent se terminer par un point-virgule `;`
+
+Le paramètre de la fonction `main` correspond aux arguments passés au programme.
+
+Par exemple :
+
+[source,bash]
+----
+javac Launcher.java # <1>
+jar -cf helloWorld.jar Launcher.class # <2>
+java -jar helloWorld.jar Launcher Lernejo # Will display ’Hello Lernejo’ # <3>
+----
+<1> Compilation, cela va produire le fichier Launcher.class contenant du _byte code_
+<2> Création d’une archive Java contenant l’unique classe compilée
+<3> Execution du programme, Java va chercher une fonction `main` dans la classe `Launcher` qui lui est indiquée comme point d’entrée, le tableau `args` aura une unique entrée, le seul paramètre qui est passé au programme : `"Lernejo"`
+
+<<<
+
+=== Les types
+
+En Java il existe deux formes de type, les types *_primitifs_* et les types objets.
+
+Les premiers commencent par une minuscule et représentent directement la donnée en mémoire :
+
+|===
+|Nom | Nombre de bits | Valeurs possibles | Exemple
+
+|boolean |32 (un `int` avec 0 ou 1 comme valeur) |true ou false | true
+
+|byte |8 |Entier positif ou négatif |
+
+|short |16 |Entier positif ou négatif | 32
+
+|int |32 |Entier positif ou négatif | 1452
+
+|long |64 |Entier positif ou négatif | 164478945
+
+|float |32 |IEEE 754 | 124.54
+
+|double |64 |IEEE 754 | 124587451.1254878
+
+|char |16 |Unicode | 'h'
+|===
+
+Les seconds sont des objets et leurs noms commencent par une majuscule.
+
+[IMPORTANT]
+====
+C’est pourquoi il est important, quand on crée un nouveau type (classe, interface, enum ou record) que son nom commence par une *[underline]#Majuscule#*.
+====
+
+=== Les variables
+
+Au sein d’une méthode, il est souvent nécessaire de stocker un résultat intermédiaire dans une variable.
+
+En Java, une variable est en fait un référant, un "pointeur" vers une adresse mémoire.
+
+Ainsi en écrivant `var b = a;`, on déclare un second référant `b` qui pointe vers la même adresse mémoire que `a`.
+
+En Java, il est possible de déclarer une variable de plusieurs façons.
+
+* `String a;` : la variable n’est pas assignée, elle ne pointe vers rien, il est nécessaire de lui assigner une valeur afin de pouvoir l’utiliser par la suite.
+Par exemple : `a = "my-name";`
+* `int a = 43;` : la variable est déclarée et assignée, elle peut être utilisée, sa valeur peut également être changée.
+Par exemple : `a++;`
+* `final MyType a;` : la variable n’est pas assignée, mais grâce au mot-clé `final`, le compilateur va garantir qu’elle ne le sera qu’une unique fois.
+Par exemple :
+
+.Fichier NameGenerator.java
+[source,java]
+----
+public class NameGenerator {
+    public String generateName(FacialHairStyle hairStyle) {
+        final String name;
+        if(Gender.BEARDED == hairStyle) {
+            name = "Barbarossa";
+        } else if(Gender.MUSTACHE == hairStyle) {
+            name = "Jenkins";
+        } else {
+            name = "Saitama";
+        }
+        return name;
+    }
+}
+----
+
+* Enfin, il est également possible d’utiliser le mot-clé `var` si le type de la variable peut être _inféré_ au moment de sa déclaration.
+Cet usage est à recommander aux endroits où la longueur d’un type diminue la lisibilité.
+Par exemple :
+
+.Fichier OccurrenceUtils.java
+[source,java]
+----
+public class OccurrenceUtils {
+    public Optional<String> mostOccurring(List<String> strings) {
+        Map<String, Long> freqMap = strings.stream()
+            .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
+        Optional<Map.Entry<String, Long>> maxEntryOpt = freqMap.entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue());
+        return maxEntryOpt.map(Map.Entry::getKey);
+    }
+}
+----
+
+Peut être simplifié :
+
+.Fichier OccurrenceUtils.java
+[source,java]
+----
+public class OccurrenceUtils {
+    public Optional<String> mostOccurring(List<String> strings) {
+        var freqMap = strings.stream()
+            .collect(Collectors.groupingBy(s -> s, Collectors.counting()));
+        var maxEntryOpt = freqMap.entrySet()
+            .stream()
+            .max(Map.Entry.comparingByValue());
+        return maxEntryOpt.map(Map.Entry::getKey);
+    }
+}
+----
+
+<<<
+
+=== Opérateurs
+
+Il existe plusieurs opérateurs en Java.
+
+Opérateurs de calculs :
+
+|===
+| Opérateur | Description | Exemple
+| + | Additionne deux nombres ou concatène deux chaînes de caractères | 1 + a
+| - | Soustrait deux nombres | 8 - a
+| * | Multiplie deux nombres | b * 4
+| / | Divise deux nombres | a / 2
+| % | Modulo (reste de la division entière) | a % 3
+|===
+
+Les opérateurs d’assignations stockent le résultat du calcul dans l’opérande de gauche :
+
+|===
+| Opérateur | Description | Exemple
+| += | Additionne deux nombres ou concatène deux chaînes de caractères | a += "toto"
+| -= | Soustrait deux nombres | a -= 3.2
+| /= | Divise deux nombres | b /= 2
+| *= | Multiplie deux nombres | a *= 2
+|===
+
+Les opérateurs d’assignations peuvent être écrits avec les opérateurs de calculs.
+Par exemple `b /= 2;` est équivalent à `b = b / 2;`.
+
+Les opérateurs d’incrémentation peuvent être placés à gauche ou à droite d’une variable de façon à ce que l’opération soit réalisée avant ou après l’exploitation du résultat.
+
+Par exemple, dans `array[++i] = 0 ;`, c’est la valeur de `i` _[underline]#après#_ l’incrémentation qui est utilisée comme index du tableau.
+A contrario, dans `array[i--] = 0 ;`, c’est la valeur de `i` _[underline]#avant#_ la décrémentation qui est utilisée comme index du tableau.
+
+Les opérateurs de comparaison, renvoient vrai si...
+
+|===
+| Opérateur | Description | Exemple
+| == | ... les deux valeurs ont la même adresse mémoire | a == 3
+| != | ... les deux valeurs n’ont pas la même adresse mémoire | a != 3
+| <  | ... le nombre de gauche est plus petit (strictement) que celui de droite | a < 3
+| <= | ... le nombre de gauche est plus petit ou égal à celui de droite | a <= 3
+| >  | ... le nombre de gauche est plus grand (strictement) que celui de droite | a > 3
+| >= | ... le nombre de gauche est plus grand ou égal à celui de droite | a >= 3
+|===
+
+Certains opérateurs logiques peuvent s’appliquer sur les entiers, auxquels cas ils fonctionnent bit à bit.
+
+|===
+| Opérateur | Description | cible | Exemple
+| &&   | AND | boolean | a && b
+| \|\| | OR  | boolean | a \|\| b
+| &    | AND | boolean et entiers | a & b
+| \|   | OR  | boolean et entiers | a \| b
+| ^    | XOR | boolean et entiers | a ^ b
+|===
+
+Les opérateurs de décalage de bit :
+
+|===
+| Opérateur | Description | Propagation du signe | Exemple
+| <<  | Décale les bits vers la gauche (multiplie par 2 à chaque décalage).
+Les bits qui sortent à gauche sont perdus, et des zéros sont insérés à droite | oui |6 << 2
+| <<  | Décale les bits vers la droite (divise par 2 à chaque décalage).
+Les bits qui sortent à droite sont perdus, et le bit non-nul de poids plus fort est recopié à gauche | oui |6 >> 2
+| >>> | Décale les bits vers la droite (divise par 2 à chaque décalage).
+Les bits qui sortent à droite sont perdus, et des zéros sont insérés à gauche | non | 6 >>> 2
+|===
+
+L’opérateur `instanceof` renvoie vrai si le type de l’objet testé, est égal à, ou égal à un sous-type de, l’opérande de droite.
+Par exemple :
+
+[source,java]
+----
+void callBarkIfPossible(Animal animal) {
+    if (animal instanceof Dog) {
+        Dog dog = (Dog) animal; // <1>
+        dog.bark();
+    }
+}
+----
+<1> Ce type de *cast* est appelé *downcasting* (passage d’un type parent à un type enfant)
+
+A partir de Java 16 l’opérateur `instanceof` peut prendre une opérande supplémentaire afin d’obtenir directement une variable du type testé :
+[source,java]
+----
+void callBarkIfPossible(Animal animal) {
+    if (animal instanceof Dog dog) {
+        dog.bark();
+    }
+}
+----
+
+=== Nommage
+
+Le nommage a un intérêt prépondérant dans le paradigme objet où le développeur essaie d’exprimer des concepts réels.
+Les classes, les champs, les méthodes, les variables, tous doivent avoir un nom clair et représentatif du rôle que joue le composant.
+Les noms peuvent être relativement longs sans que ce soit un problème.
+La convention en Java est le `camelCase` de manière générale, l’ `UpperCamelCase` pour les types (nom de classe, d’interface, d’enum ou de record).
+On peut également trouver/utiliser le `lower_snake_case` pour les noms des méthodes de test.
