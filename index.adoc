@@ -1,4 +1,4 @@
-= Java 101
+= Java 1 ère année
 Kouame André
 :reproducible:
 :toc-title: Cours Java première année
