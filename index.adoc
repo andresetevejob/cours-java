@@ -1,0 +1,63 @@
+= Java 101
+Kouame André
+:reproducible:
+:toc-title: Cours Java première année
+:listing-caption: Listing
+:tip-caption: Conseil
+:caution-caption: ⚠️
+:source-highlighter: rouge
+:hardbreaks-option:
+:toc: left
+:title-page:
+
+:course-root:
+
+ifndef::ci[]
+:imagesdir: ./images
+endif::[]
+
+ifdef::ci[]
+:imagesdir: {ci-images-dir}
+endif::[]
+
+ifdef::env-vscode[]
+:source-highlighter: highlightjs
+endif::[]
+
+ifndef::env-vscode[]
+:source-highlighter: rouge
+endif::[]
+
+:title-logo-image: image::logo.png[top=25%, align=center, pdfwidth=0.5in]
+
+<<<
+
+include::chapters/introduction.adoc[]
+
+:sectnums:
+
+<<<
+
+include::chapters/chapter-1.adoc[]
+
+<<<
+
+include::chapters/chapter-2.adoc[]
+
+<<<
+
+include::chapters/chapter-3.adoc[]
+
+<<<
+
+include::chapters/chapter-4.adoc[]
+
+<<<
+
+include::chapters/chapter-5.adoc[]
+
+<<<
+
+:sectnums!:
+
+include::chapters/conclusion.adoc[]
